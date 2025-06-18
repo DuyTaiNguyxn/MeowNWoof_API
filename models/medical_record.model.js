@@ -6,23 +6,23 @@ class MedicalRecord {
         this.medical_record_id = data.medical_record_id;
         this.pet_id = data.pet_id;
         this.record_date = data.record_date;
-        this.symptoms = data.symptoms;
-        this.preliminary_diagnosis = data.preliminary_diagnosis;
+        this.symptoms = data.symptoms || null;
+        this.preliminary_diagnosis = data.preliminary_diagnosis || null;
         this.final_diagnosis = data.final_diagnosis;
         this.treatment_method = data.treatment_method;
         this.veterinarian_id = data.veterinarian_id;
-        this.veterinarian_note = data.veterinarian_note;
+        this.veterinarian_note = data.veterinarian_note || null;
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;
 
         if (data.veterinarian_employee_id) {
             this.veterinarian = {
                 employee_id: data.veterinarian_employee_id,
-                full_name: data.veterinarian_full_name,
-                phone: data.veterinarian_phone,
-                email: data.veterinarian_email,
-                role: data.veterinarian_role,
-                avatarURL: data.veterinarian_avatarURL,
+                full_name: data.veterinarian_full_name || null,
+                phone: data.veterinarian_phone || null,
+                email: data.veterinarian_email || null,
+                role: data.veterinarian_role || null,
+                avatarURL: data.veterinarian_avatarURL || null,
             };
         } else {
             this.veterinarian = null;
@@ -48,27 +48,41 @@ class MedicalRecord {
     // --- Các phương thức CRUD (giữ nguyên không đổi) ---
     static async create(newMedicalRecordData) {
         try {
-            const result = await db.query(
+            const [result] = await db.execute(
                 `INSERT INTO PetMedicalRecords (pet_id, record_date, symptoms, preliminary_diagnosis, final_diagnosis, treatment_method, veterinarian_id, veterinarian_note)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     newMedicalRecordData.pet_id,
                     newMedicalRecordData.record_date,
-                    newMedicalRecordData.symptoms,
-                    newMedicalRecordData.preliminary_diagnosis,
+                    newMedicalRecordData.symptoms || null,
+                    newMedicalRecordData.preliminary_diagnosis || null,
                     newMedicalRecordData.final_diagnosis,
                     newMedicalRecordData.treatment_method,
                     newMedicalRecordData.veterinarian_id,
-                    newMedicalRecordData.veterinarian_note
+                    newMedicalRecordData.veterinarian_note || null
                 ]
             );
+
             if (result.insertId) {
+                // Sau khi chèn thành công, tìm và trả về bản ghi vừa tạo
+                //console.log(`CREATE - Calling findById with ID: ${result.insertId}`);
                 const createdRecord = await this.findById(result.insertId);
-                return createdRecord;
+                //console.log("CREATE - Result from findById:", createdRecord);
+                
+                if (createdRecord) {
+                    return createdRecord; // Trả về bản ghi đầy đủ
+                } else {
+                    //console.error(`CREATE - findById returned null for ID: ${result.insertId}. Could not retrieve the newly created record.`);
+                    // Trong trường hợp này, việc chèn thành công nhưng không thể lấy lại bản ghi.
+                    // Bạn có thể chọn ném lỗi hoặc trả về null tùy theo logic ứng dụng.
+                    throw new Error('Đã tạo hồ sơ nhưng không thể truy xuất thông tin chi tiết.');
+                }
+            } else {
+                //console.error("CREATE - result.insertId is falsy (0 or undefined). Medical record might not have been inserted.");
+                throw new Error('Không thể chèn hồ sơ bệnh án vào cơ sở dữ liệu.');
             }
-            return null;
         } catch (error) {
-            console.error("Error creating medical record:", error);
+            //console.error("Error creating medical record:", error);
             throw error;
         }
     }

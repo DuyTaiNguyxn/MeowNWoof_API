@@ -111,12 +111,37 @@ class Pet {
     }
 
     static async create(petData) {
-        const { pet_name, species_id, breed_id, age, gender, weight, imageURL, owner_id } = petData;
+        const { pet_name, species_id, breed_id, age, gender, weight, imageURL, owner } = petData;
+        let final_owner_id = null; // Khởi tạo owner_id cuối cùng
+
+        if (owner && owner.phone) {
+            let existingOwner = await PetOwner.findByPhone(owner.phone);
+
+            if (existingOwner) {
+                final_owner_id = existingOwner.owner_id;
+                console.log('Chủ sở hữu đã tồn tại, sử dụng ID:', final_owner_id);
+            } else {
+                const newOwner = await PetOwner.create({
+                    owner_name: owner.owner_name,
+                    phone: owner.phone,
+                    email: owner.email,
+                    address: owner.address
+                });
+                final_owner_id = newOwner.owner_id;
+                console.log('Đã tạo chủ sở hữu mới với ID:', final_owner_id);
+            }
+        } else {
+            throw new Error('Thông tin chủ sở hữu (tên và số điện thoại) là bắt buộc.');
+        }
+
+        // Thực hiện chèn thông tin pet vào cơ sở dữ liệu
         const [result] = await db.execute(
             'INSERT INTO Pets (pet_name, species_id, breed_id, age, gender, weight, imageURL, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [pet_name, species_id, breed_id, age, gender, weight, imageURL, owner_id]
+            [pet_name, species_id, breed_id, age, gender, weight, imageURL, final_owner_id]
         );
-        return { pet_id: result.insertId, ...petData };
+
+        // Trả về thông tin pet đã tạo kèm theo owner_id
+        return { pet_id: result.insertId, ...petData, owner_id: final_owner_id };
     }
 
     static async update(id, petData) {

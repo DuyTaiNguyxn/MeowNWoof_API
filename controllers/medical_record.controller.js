@@ -4,30 +4,30 @@ const MedicalRecord = require('../models/medical_record.model');
 exports.createMedicalRecord = async (req, res) => {
     try {
         // Kiểm tra dữ liệu đầu vào cần thiết tối thiểu
-        const { pet_id, record_date, symptoms, preliminary_diagnosis, veterinarian_id } = req.body;
-        if (!pet_id || !record_date || !symptoms || !preliminary_diagnosis || !veterinarian_id) {
-            return res.status(400).json({ message: 'Missing required fields: pet_id, record_date, symptoms, preliminary_diagnosis, veterinarian_id' });
+        const { pet_id, record_date, final_diagnosis, treatment_method, veterinarian_id } = req.body;
+        if (!pet_id || !record_date || !final_diagnosis || !treatment_method || !veterinarian_id) {
+            return res.status(400).json({ message: 'Missing required fields: pet_id, record_date, final_diagnosis, treatment_method, veterinarian_id' });
         }
 
         const newRecordData = {
             pet_id: pet_id,
             record_date: record_date,
-            symptoms: symptoms,
-            preliminary_diagnosis: preliminary_diagnosis,
-            final_diagnosis: req.body.final_diagnosis || null,
-            treatment_method: req.body.treatment_method || null,
+            symptoms: req.body.symptoms || null,
+            preliminary_diagnosis: req.body.preliminary_diagnosis || null,
+            final_diagnosis: final_diagnosis,
+            treatment_method: treatment_method,
             veterinarian_id: veterinarian_id,
             veterinarian_note: req.body.veterinarian_note || null,
         };
 
         const newRecord = await MedicalRecord.create(newRecordData);
-
         if (newRecord) {
             res.status(201).json({
                 message: 'Hồ sơ bệnh án được tạo thành công!',
                 data: newRecord
             });
         } else {
+            console.error("Medical record creation failed, newRecord is null.");
             res.status(500).json({ message: 'Không thể tạo hồ sơ bệnh án.' });
         }
     } catch (error) {

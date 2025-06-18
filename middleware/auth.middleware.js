@@ -13,7 +13,7 @@ exports.verifyToken = (req, res, next) => {
   if (token.startsWith('Bearer ')) {
     token = token.slice(7, token.length);
   }
-  console.log('[AuthMiddleware] Token nhận được:', token);
+  //console.log('[AuthMiddleware] Token nhận được:', token);
 
   jwt.verify(token, jwtConfig.secret, (err, decoded) => {
     if (err) {
@@ -30,7 +30,7 @@ exports.verifyToken = (req, res, next) => {
     // Gán toàn bộ payload đã giải mã vào req.user
     // Điều này sẽ làm cho req.user có các thuộc tính: employee_id, username, email, role
     req.user = decoded;
-    console.log('[AuthMiddleware] req.user sau khi gán:', req.user); // DEBUG: Xác nhận req.user
+    //console.log('[AuthMiddleware] req.user sau khi gán:', req.user); // DEBUG: Xác nhận req.user
 
     // Chuyển quyền điều khiển cho middleware hoặc route handler tiếp theo
     next();

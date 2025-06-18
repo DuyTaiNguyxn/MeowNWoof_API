@@ -32,63 +32,17 @@ exports.getPetById = async (req, res) => {
 // Tạo pet mới
 exports.createPet = async (req, res) => {
     // Nhận toàn bộ dữ liệu từ body, bao gồm đối tượng owner
-    const { pet_name, species_id, breed_id, age, gender, weight, imageURL, owner } = req.body;
-
-    // Log dữ liệu nhận được từ request để kiểm tra
-    console.log('Controller received pet data:', req.body);
-    console.log('Controller received owner data:', owner); // owner là đối tượng được gửi từ Flutter
+    const petData = req.body; 
 
     try {
-        let final_owner_id = null; // Khởi tạo owner_id cuối cùng
-
-        if (owner && owner.phone) { // Đảm bảo thông tin owner và SĐT được gửi đến
-            // Kiểm tra xem chủ sở hữu đã tồn tại dựa trên số điện thoại chưa
-            let existingOwner = await PetOwner.findByPhone(owner.phone);
-
-            if (existingOwner) {
-                final_owner_id = existingOwner.owner_id; // Sử dụng ID của chủ sở hữu đã tồn tại
-                console.log('Chủ sở hữu đã tồn tại, sử dụng ID:', final_owner_id);
-            } else {
-                // Nếu chưa tồn tại, tạo chủ sở hữu mới
-                // console.log('Creating new owner with data:', {
-                //     owner_name: owner.owner_name,
-                //     phone: owner.phone,
-                //     email: owner.email,
-                //     address: owner.address
-                // });
-                const newOwner = await PetOwner.create({
-                    owner_name: owner.owner_name,
-                    phone: owner.phone,
-                    email: owner.email,
-                    address: owner.address
-                });
-                final_owner_id = newOwner.owner_id; // Lấy ID của chủ sở hữu vừa tạo
-                console.log('Đã tạo chủ sở hữu mới với ID:', final_owner_id);
-            }
-        } else {
-            // Nếu không có thông tin owner hợp lệ hoặc thiếu số điện thoại
-            return res.status(400).json({ message: 'Thông tin chủ sở hữu (tên và số điện thoại) là bắt buộc.' });
-        }
-
-        // 2. Chuẩn bị dữ liệu cho Pet
-        const newPetData = {
-            pet_name,
-            species_id,
-            breed_id,
-            age,
-            gender,
-            weight,
-            imageURL, // Vẫn là imageURL theo req.body nhận được từ Flutter
-            owner_id: final_owner_id // Gán owner_id đã xác định
-        };
-
-        // 3. Tạo Pet mới trong DB
-        const createdPet = await Pet.create(newPetData);
+        // Gọi hàm create của Pet, nó sẽ tự xử lý việc tạo/tìm owner
+        const createdPet = await Pet.create(petData);
 
         res.status(201).json(createdPet); // Trả về đối tượng pet đã tạo với ID
     } catch (err) {
         console.error('Error creating pet:', err);
-        res.status(500).json({ message: 'Lỗi server khi tạo pet.', error: err.message });
+        // Trả về lỗi chi tiết hơn nếu có
+        res.status(err.message.includes('bắt buộc') ? 400 : 500).json({ message: err.message || 'Lỗi server khi tạo pet.' });
     }
 };
 
