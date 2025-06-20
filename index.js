@@ -12,6 +12,10 @@ const ownerRoutes = require('./routes/owner.routes');
 const speciesRoutes = require('./routes/species.routes');
 const breedRoutes = require('./routes/breed.routes');
 const medicalRecordRoutes = require('./routes/medical_record.routes');
+const medicineRoutes = require('./routes/medicine.routes');
+const typeRoutes = require('./routes/medicine_type.routes');
+const unitRoutes = require('./routes/medicine_unit.routes');
+const appointmentRoutes = require('./routes/appointment.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,6 +48,10 @@ app.use('/api/owners', ownerRoutes);
 app.use('/api/species', speciesRoutes);
 app.use('/api/breeds', breedRoutes);
 app.use('/api/medical-records', medicalRecordRoutes);
+app.use('/api/medicines', medicineRoutes);
+app.use('/api/types', typeRoutes);
+app.use('/api/units', unitRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
 // Route cơ bản để kiểm tra server hoạt động
 app.get('/', (req, res) => {
