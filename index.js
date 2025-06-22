@@ -16,20 +16,17 @@ const medicineRoutes = require('./routes/medicine.routes');
 const typeRoutes = require('./routes/medicine_type.routes');
 const unitRoutes = require('./routes/medicine_unit.routes');
 const appointmentRoutes = require('./routes/appointment.routes');
+const vaccinationRoutes = require('./routes/vaccination.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(bodyParser.json()); // Để phân tích các yêu cầu JSON
-app.use(bodyParser.urlencoded({ extended: true })); // Để phân tích các yêu cầu URL-encoded
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// Thêm CORS middleware. Rất quan trọng cho ứng dụng Flutter.
-// Trong môi trường production, bạn nên cấu hình CORS chặt chẽ hơn
-// để chỉ cho phép các origin cụ thể truy cập API của bạn.
 app.use(cors());
 
-// Kiểm tra kết nối Database (tùy chọn, nhưng nên có)
 db.getConnection()
   .then(connection => {
     console.log('Connected to MySQL database!');
@@ -37,11 +34,9 @@ db.getConnection()
   })
   .catch(err => {
     console.error('Error connecting to MySQL:', err.message);
-    // Có thể thoát ứng dụng nếu không kết nối được DB
-    // process.exit(1);
   });
 
-app.use('/api/pets', petRoutes); // Đường dẫn gốc cho Pet
+app.use('/api/pets', petRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/owners', ownerRoutes);
@@ -52,13 +47,12 @@ app.use('/api/medicines', medicineRoutes);
 app.use('/api/types', typeRoutes);
 app.use('/api/units', unitRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/vaccinations', vaccinationRoutes);
 
-// Route cơ bản để kiểm tra server hoạt động
 app.get('/', (req, res) => {
   res.send('MEOWNWOOF_API is running!');
 });
 
-// Khởi động server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   console.log(`Access API at http://localhost:${PORT}`);

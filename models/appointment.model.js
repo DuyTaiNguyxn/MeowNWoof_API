@@ -5,7 +5,7 @@ class Appointment {
     this.appointment_id = data.appointment_id;
     this.pet_id = data.pet_id;
     this.appointment_datetime = data.appointment_datetime;
-    this.healthcare_staff_id = data.healthcare_staff_id;
+    this.employee_id = data.employee_id;
     this.veterinarian_id = data.veterinarian_id;
     this.status = data.status;
     this.created_at = data.created_at;
@@ -16,9 +16,6 @@ class Appointment {
       ? {
           employee_id: data.veterinarian_employee_id,
           full_name: data.veterinarian_full_name || null,
-          phone: data.veterinarian_phone || null,
-          email: data.veterinarian_email || null,
-          role: data.veterinarian_role || null,
           avatarURL: data.veterinarian_avatarURL || null,
         }
       : null;
@@ -28,14 +25,7 @@ class Appointment {
       ? {
           pet_id: data.pet_id,
           pet_name: data.pet_name,
-          species_id: data.species_id,
-          breed_id: data.breed_id,
-          age: data.age || null,
-          gender: data.gender || null,
-          weight: data.weight || null,
-          imageURL: data.imageURL || null,
-          species_name: data.species_name || null,
-          breed_name: data.breed_name || null,
+          imageURL: data.pet_imageURL || null,
         }
       : null;
   }
@@ -46,24 +36,12 @@ class Appointment {
         a.*,
         v.employee_id AS veterinarian_employee_id,
         v.full_name AS veterinarian_full_name,
-        v.email AS veterinarian_email,
-        v.phone AS veterinarian_phone,
-        v.role AS veterinarian_role,
         v.avatarURL AS veterinarian_avatarURL,
         p.pet_name,
-        p.species_id,
-        p.breed_id,
-        p.age,
-        p.gender,
-        p.weight,
-        p.imageURL,
-        S.species_name,
-        B.breed_name
+        p.imageURL AS pet_imageURL
       FROM appointments a
       LEFT JOIN employees v ON a.veterinarian_id = v.employee_id
       LEFT JOIN pets p ON a.pet_id = p.pet_id
-      LEFT JOIN species S ON p.species_id = S.species_id
-      LEFT JOIN breeds B ON p.breed_id = B.BreeD_id
       ${query}
     `;
   }
@@ -71,12 +49,12 @@ class Appointment {
   static async create(data) {
     const [result] = await db.execute(
       `INSERT INTO appointments (
-        pet_id, appointment_datetime, healthcare_staff_id, veterinarian_id, status
+        pet_id, appointment_datetime, employee_id, veterinarian_id, status
       ) VALUES (?, ?, ?, ?, ?)`,
       [
         data.pet_id,
         data.appointment_datetime,
-        data.healthcare_staff_id,
+        data.employee_id,
         data.veterinarian_id,
         data.status,
       ]

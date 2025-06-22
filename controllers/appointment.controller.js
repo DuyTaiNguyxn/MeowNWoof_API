@@ -4,9 +4,9 @@ const { format } = require('date-fns');
 
 exports.createAppointment = async (req, res) => {
   try {
-    const { pet_id, appointment_datetime, healthcare_staff_id, veterinarian_id, status } = req.body;
-    if (!pet_id || !appointment_datetime || !healthcare_staff_id || !veterinarian_id || !status) {
-      return res.status(400).json({ message: 'Missing required fields: pet_id, appointment_datetime, healthcare_staff_id, veterinarian_id, status' });
+    const { pet_id, appointment_datetime, employee_id, veterinarian_id, status } = req.body;
+    if (!pet_id || !appointment_datetime || !employee_id || !veterinarian_id || !status) {
+      return res.status(400).json({ message: 'Missing required fields: pet_id, appointment_datetime, employee_id, veterinarian_id, status' });
     }
 
     // Đảm bảo định dạng ngày giờ phù hợp với CSDL
@@ -15,7 +15,7 @@ exports.createAppointment = async (req, res) => {
     const newAppointmentData = {
       pet_id: pet_id,
       appointment_datetime: formattedDatetime,
-      healthcare_staff_id: healthcare_staff_id,
+      employee_id: employee_id,
       veterinarian_id: veterinarian_id,
       status: status,
     };

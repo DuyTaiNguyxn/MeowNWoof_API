@@ -12,6 +12,8 @@ router.post('/', authMiddleware.verifyToken, appointmentController.createAppoint
 
 router.put('/:id', authMiddleware.verifyToken, appointmentController.updateAppointment);
 
+router.put('/status/:id', authMiddleware.verifyToken, appointmentController.updateAppointmentStatus);
+
 router.delete('/:id', authMiddleware.verifyToken, appointmentController.deleteAppointment);
 
 module.exports = router;
