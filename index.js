@@ -17,6 +17,8 @@ const typeRoutes = require('./routes/medicine_type.routes');
 const unitRoutes = require('./routes/medicine_unit.routes');
 const appointmentRoutes = require('./routes/appointment.routes');
 const vaccinationRoutes = require('./routes/vaccination.routes');
+const prescriptionRoutes = require('./routes/prescription.routes');
+const prescriptionItemRoutes = require('./routes/prescription_item.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -48,6 +50,8 @@ app.use('/api/types', typeRoutes);
 app.use('/api/units', unitRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/vaccinations', vaccinationRoutes);
+app.use('/api/prescriptions', prescriptionRoutes);
+app.use('/api/prescription-items', prescriptionItemRoutes);
 
 app.get('/', (req, res) => {
   res.send('MEOWNWOOF_API is running!');
