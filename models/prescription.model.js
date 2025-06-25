@@ -2,6 +2,7 @@ const pool = require('../config/db');
 
 class Prescription {
     constructor(prescription) {
+        this.prescription_id = prescription.prescription_id;
         this.medical_record_id = prescription.medical_record_id;
         this.veterinarian_id = prescription.veterinarian_id;
         this.veterinarian_note = prescription.veterinarian_note;
@@ -12,9 +13,17 @@ class Prescription {
         try {
             const [result] = await pool.execute(
                 'INSERT INTO prescriptions (medical_record_id, veterinarian_id, veterinarian_note, prescription_date) VALUES (?, ?, ?, ?)',
-                [newPrescription.medical_record_id, newPrescription.veterinarian_id, newPrescription.veterinarian_note, newPrescription.prescription_date]
+                [
+                    newPrescription.medical_record_id,
+                    newPrescription.veterinarian_id,
+                    newPrescription.veterinarian_note,
+                    newPrescription.prescription_date
+                ]
             );
-            return { id: result.insertId, ...newPrescription };
+            return {
+                prescription_id: result.insertId,
+                ...newPrescription
+            };
         } catch (error) {
             throw error;
         }
@@ -45,28 +54,49 @@ class Prescription {
                  FROM prescriptionitems pd
                  JOIN medicines m ON pd.medicine_id = m.medicine_id
                  WHERE pd.prescription_id = ?`,
-                [id]
+                [prescription.prescription_id]
             );
 
-            // Nhúng items vào prescription
             prescription.items = itemRows;
-
             return prescription;
         } catch (error) {
             throw error;
         }
     }
 
-    static async updateById(id, prescription) {
+    static async updateById(id, fieldsToUpdate) {
         try {
-            const [result] = await pool.execute(
-                'UPDATE prescriptions SET veterinarian_note = ?, prescription_date = ? WHERE prescription_id = ?',
-                [prescription.veterinarian_note, prescription.prescription_date, id]
-            );
-            if (result.affectedRows === 0) {
+            const updateFields = [];
+            const updateValues = [];
+
+            for (const key in fieldsToUpdate) {
+                if (fieldsToUpdate.hasOwnProperty(key)) {
+                    updateFields.push(`${key} = ?`);
+                    updateValues.push(fieldsToUpdate[key]);
+                }
+            }
+
+            if (updateFields.length === 0) {
                 return null;
             }
-            return { id: id, ...prescription };
+
+            const updateQuery = `UPDATE prescriptions SET ${updateFields.join(', ')} WHERE prescription_id = ?`;
+            updateValues.push(id);
+
+            const [updateResult] = await pool.execute(updateQuery, updateValues);
+
+            if (updateResult.affectedRows === 0) {
+                return null;
+            }
+
+            const [rows] = await pool.execute('SELECT * FROM prescriptions WHERE prescription_id = ?', [id]);
+
+            if (rows.length === 0) {
+                return null;
+            }
+
+            return rows[0];
+
         } catch (error) {
             throw error;
         }
