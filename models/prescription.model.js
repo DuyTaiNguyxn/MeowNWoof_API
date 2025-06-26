@@ -101,6 +101,31 @@ class Prescription {
             throw error;
         }
     }
+
+    static async deleteItemsByPrescriptionId(prescriptionId) {
+        try {
+            const [result] = await pool.execute(
+                'DELETE FROM prescriptionitems WHERE prescription_id = ?',
+                [prescriptionId]
+            );
+            return result.affectedRows;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async deletePrescription(prescriptionId) {
+        try {
+            await pool.execute(
+                'DELETE FROM prescriptions WHERE prescription_id = ?',
+                [prescriptionId]
+            );
+            return true;
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 module.exports = Prescription;

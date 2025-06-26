@@ -3,9 +3,12 @@ const Prescription = require('../models/prescription.model');
 exports.createPrescription = async (req, res) => {
     try {
         const newPrescription = new Prescription(req.body);
+        console.log('Thông tin đơn thuốc mới nhận được:', newPrescription);
+
         if (!newPrescription.medical_record_id || !newPrescription.veterinarian_id) {
             return res.status(400).send({ message: 'Vui lòng cung cấp medical_record_id và veterinarian_id.' });
         }
+
         const prescription = await Prescription.create(newPrescription);
         res.status(201).send(prescription);
     } catch (error) {
@@ -60,5 +63,40 @@ exports.updatePrescription = async (req, res) => {
 
     } catch (error) {
         res.status(500).send({ message: error.message || 'Đã xảy ra lỗi khi cập nhật đơn thuốc.' });
+    }
+};
+
+exports.deleteItem = async (req, res) => {
+    const prescriptionId = req.params.id;
+
+    try {
+        // Xoá các prescription_item liên quan đến prescriptionId
+        const deletedItemsCount = await Prescription.deleteItemsByPrescriptionId(prescriptionId);
+
+        res.status(200).send({
+            message: `Đã xoá ${deletedItemsCount} thuốc khỏi đơn thuốc.`,
+            deletedCount: deletedItemsCount,
+        });
+    } catch (error) {
+        console.error('[PrescriptionController] Lỗi khi xoá thuốc:', error);
+        res.status(500).send({
+            message: 'Đã xảy ra lỗi khi xoá các thuốc khỏi đơn thuốc.',
+        });
+    }
+};
+
+exports.deletePrescription = async (req, res) => {
+    const prescriptionId = req.params.id;
+
+    try {
+        await Prescription.deletePrescription(prescriptionId);
+
+        res.status(200).send({
+            message: `Đã xoá ghi chú đơn thuốc.`
+        });
+    } catch (error) {
+        res.status(500).send({
+            message: 'Đã xảy ra lỗi khi xoá note đơn thuốc.',
+        });
     }
 };

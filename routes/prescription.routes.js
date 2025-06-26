@@ -12,4 +12,8 @@ router.post('/', authMiddleware.verifyToken, prescriptionController.createPrescr
 
 router.put('/:id', authMiddleware.verifyToken, prescriptionController.updatePrescription);
 
+router.delete('/:id', authMiddleware.verifyToken, prescriptionController.deletePrescription);
+
+router.delete('/:id/items', authMiddleware.verifyToken, prescriptionController.deleteItem);
+
 module.exports = router;
