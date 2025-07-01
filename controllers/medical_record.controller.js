@@ -3,7 +3,6 @@ const MedicalRecord = require('../models/medical_record.model');
 
 exports.createMedicalRecord = async (req, res) => {
     try {
-        // Kiểm tra dữ liệu đầu vào cần thiết tối thiểu
         const { pet_id, record_date, final_diagnosis, treatment_method, veterinarian_id } = req.body;
         if (!pet_id || !record_date || !final_diagnosis || !treatment_method || !veterinarian_id) {
             return res.status(400).json({ message: 'Missing required fields: pet_id, record_date, final_diagnosis, treatment_method, veterinarian_id' });
@@ -77,7 +76,6 @@ exports.updateMedicalRecord = async (req, res) => {
         const success = await MedicalRecord.update(recordId, updatedData);
 
         if (success) {
-            // Lấy lại bản ghi đã cập nhật để gửi về client
             const updatedRecord = await MedicalRecord.findById(recordId);
             res.status(200).json({
                 message: `Hồ sơ bệnh án với ID ${recordId} đã được cập nhật thành công!`,
@@ -95,9 +93,6 @@ exports.updateMedicalRecord = async (req, res) => {
 exports.deleteMedicalRecord = async (req, res) => {
     try {
         const recordId = req.params.id;
-
-        // Tương tự, có thể thêm kiểm tra quyền ở đây
-
         const success = await MedicalRecord.delete(recordId);
 
         if (success) {

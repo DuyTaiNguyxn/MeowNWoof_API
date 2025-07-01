@@ -9,7 +9,6 @@ exports.createAppointment = async (req, res) => {
       return res.status(400).json({ message: 'Missing required fields: pet_id, appointment_datetime, employee_id, veterinarian_id, status' });
     }
 
-    // Đảm bảo định dạng ngày giờ phù hợp với CSDL
     const formattedDatetime = format(new Date(appointment_datetime), 'yyyy-MM-dd HH:mm:ss');
 
     const newAppointmentData = {
@@ -74,7 +73,6 @@ exports.updateAppointment = async (req, res) => {
     const appointmentId = req.params.id;
     const updatedData = req.body;
 
-    // Nếu có cập nhật appointment_datetime, cần format lại
     if (updatedData.appointment_datetime) {
       updatedData.appointment_datetime = format(new Date(updatedData.appointment_datetime), 'yyyy-MM-dd HH:mm:ss');
     }
@@ -82,7 +80,6 @@ exports.updateAppointment = async (req, res) => {
     const success = await Appointment.update(appointmentId, updatedData);
 
     if (success) {
-      // Lấy lại bản ghi đã cập nhật để gửi về client
       const updatedAppointment = await Appointment.findById(appointmentId);
       res.status(200).json({
         message: `Lịch khám với ID ${appointmentId} đã được cập nhật thành công!`,
@@ -117,7 +114,7 @@ exports.deleteAppointment = async (req, res) => {
 exports.updateAppointmentStatus = async (req, res) => {
   try {
     const appointmentId = req.params.id;
-    const { status: newStatus } = req.body; // Lấy 'status' từ body và đổi tên thành 'newStatus'
+    const { status: newStatus } = req.body;
 
     if (!newStatus) {
       return res.status(400).json({ message: 'Trạng thái mới không được cung cấp.' });
@@ -126,7 +123,6 @@ exports.updateAppointmentStatus = async (req, res) => {
     const success = await Appointment.setStatus(appointmentId, newStatus);
 
     if (success) {
-      // Lấy lại bản ghi đã cập nhật để gửi về client
       const updatedAppointment = await Appointment.findById(appointmentId);
       res.status(200).json({
         message: `Trạng thái lịch khám với ID ${appointmentId} đã được cập nhật thành công!`,

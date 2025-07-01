@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise'); // Use promise-based API for async/await
+const mysql = require('mysql2/promise');
 
 const dbConfig = {
   host: process.env.DB_HOST,

@@ -31,7 +31,7 @@ exports.getBreedById = async (req, res) => {
 
 exports.getBreedsBySpeciesId = async (req, res) => {
     try {
-        const speciesId = parseInt(req.params.speciesId); // Chuyển sang số nguyên
+        const speciesId = parseInt(req.params.speciesId);
         if (isNaN(speciesId)) {
             return res.status(400).json({ message: 'ID loài không hợp lệ' });
         }

@@ -1,12 +1,11 @@
 // controllers/pet.controller.js
 
-const Pet = require('../models/pet.model'); // Import Pet model
-const PetOwner = require('../models/owner.model'); // Import PetOwner model mới tạo
+const Pet = require('../models/pet.model');
+const PetOwner = require('../models/owner.model');
 
-// Lấy tất cả pets
 exports.getAllPets = async (req, res) => {
     try {
-        const pets = await Pet.findAll(); // Gọi phương thức từ Pet model
+        const pets = await Pet.findAll();
         res.json(pets);
     } catch (err) {
         console.error('Error fetching all pets:', err);
@@ -14,7 +13,6 @@ exports.getAllPets = async (req, res) => {
     }
 };
 
-// Lấy pet theo ID
 exports.getPetById = async (req, res) => {
     const { id } = req.params;
     try {
@@ -29,32 +27,26 @@ exports.getPetById = async (req, res) => {
     }
 };
 
-// Tạo pet mới
 exports.createPet = async (req, res) => {
-    // Nhận toàn bộ dữ liệu từ body, bao gồm đối tượng owner
     const petData = req.body; 
 
     try {
-        // Gọi hàm create của Pet, nó sẽ tự xử lý việc tạo/tìm owner
         const createdPet = await Pet.create(petData);
 
-        res.status(201).json(createdPet); // Trả về đối tượng pet đã tạo với ID
+        res.status(201).json(createdPet);
     } catch (err) {
         console.error('Error creating pet:', err);
-        // Trả về lỗi chi tiết hơn nếu có
         res.status(err.message.includes('bắt buộc') ? 400 : 500).json({ message: err.message || 'Lỗi server khi tạo pet.' });
     }
 };
 
-// Cập nhật pet
 exports.updatePet = async (req, res) => {
     const { id } = req.params;
-    const petData = req.body; // Dữ liệu cập nhật từ client
+    const petData = req.body;
 
-    console.log('Controller received pet data:', req.body); // Log dữ liệu nhận được
+    console.log('Controller received pet data:', req.body);
 
     try {
-        // Gọi phương thức update của model, nó sẽ trả về đối tượng pet đã cập nhật
         const updatedPet = await Pet.update(id, petData);
 
         if (updatedPet) {
@@ -68,7 +60,6 @@ exports.updatePet = async (req, res) => {
     }
 };
 
-// Xóa pet
 exports.deletePet = async (req, res) => {
     const { id } = req.params;
 

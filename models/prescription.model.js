@@ -40,7 +40,6 @@ class Prescription {
 
     static async getByRecordId(id) {
         try {
-            // Lấy thông tin đơn thuốc chính
             const [prescriptionRows] = await pool.execute(
                 'SELECT * FROM prescriptions WHERE medical_record_id = ?',
                 [id]
@@ -48,7 +47,6 @@ class Prescription {
             const prescription = prescriptionRows[0];
             if (!prescription) return null;
 
-            // Lấy các thuốc trong đơn
             const [itemRows] = await pool.execute(
                 `SELECT pd.*, m.medicine_name, m.imageURL
                  FROM prescriptionitems pd

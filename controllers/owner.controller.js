@@ -1,11 +1,10 @@
 // controllers/owner.controller.js
 
-const PetOwner = require('../models/owner.model'); // Import PetOwner model
+const PetOwner = require('../models/owner.model');
 
-// Lấy tất cả owners
 exports.getAllPetOwners = async (req, res) => {
   try {
-    const owners = await PetOwner.findAll(); // Gọi phương thức từ PetOwner model
+    const owners = await PetOwner.findAll();
     res.json(owners);
   } catch (err) {
     console.error('Error fetching all owners:', err);
@@ -13,7 +12,6 @@ exports.getAllPetOwners = async (req, res) => {
   }
 };
 
-// Lấy owner theo ID (ví dụ)
 exports.getPetOwnerById = async (req, res) => {
   const { id } = req.params;
   try {

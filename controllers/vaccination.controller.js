@@ -1,17 +1,15 @@
 // controllers/vaccinationController.js
-const Vaccination = require('../models/vaccination.model'); // Đảm bảo đường dẫn đến model Vaccination là đúng
-const { format } = require('date-fns'); // Để định dạng ngày giờ cho phù hợp với CSDL
+const Vaccination = require('../models/vaccination.model');
+const { format } = require('date-fns');
 
 exports.createVaccination = async (req, res) => {
   try {
     const { pet_id, vaccination_datetime, disease_prevented, vaccine_id, employee_id, status } = req.body;
 
-    // Kiểm tra các trường bắt buộc
     if (!pet_id || !vaccination_datetime || !disease_prevented || !vaccine_id || !employee_id || !status) {
       return res.status(400).json({ message: 'Thiếu các trường bắt buộc: pet_id, vaccination_datetime, disease_prevented, vaccine_id, employee_id, status' });
     }
 
-    // Đảm bảo định dạng ngày giờ phù hợp với CSDL
     const formattedDatetime = format(new Date(vaccination_datetime), 'yyyy-MM-dd HH:mm:ss');
 
     const newVaccinationData = {
@@ -77,7 +75,6 @@ exports.updateVaccination = async (req, res) => {
     const vaccinationId = req.params.id;
     const updatedData = req.body;
 
-    // Nếu có cập nhật vaccination_datetime, cần format lại
     if (updatedData.vaccination_datetime) {
       updatedData.vaccination_datetime = format(new Date(updatedData.vaccination_datetime), 'yyyy-MM-dd HH:mm:ss');
     }
@@ -85,7 +82,6 @@ exports.updateVaccination = async (req, res) => {
     const success = await Vaccination.update(vaccinationId, updatedData);
 
     if (success) {
-      // Lấy lại bản ghi đã cập nhật để gửi về client
       const updatedVaccination = await Vaccination.findById(vaccinationId);
       res.status(200).json({
         message: `Lịch tiêm chủng với ID ${vaccinationId} đã được cập nhật thành công!`,
@@ -120,7 +116,7 @@ exports.deleteVaccination = async (req, res) => {
 exports.updateVaccinationStatus = async (req, res) => {
   try {
     const vaccinationId = req.params.id;
-    const { status: newStatus } = req.body; // Lấy 'status' từ body và đổi tên thành 'newStatus'
+    const { status: newStatus } = req.body;
 
     if (!newStatus) {
       return res.status(400).json({ message: 'Trạng thái mới không được cung cấp.' });
@@ -129,7 +125,6 @@ exports.updateVaccinationStatus = async (req, res) => {
     const success = await Vaccination.setStatus(vaccinationId, newStatus);
 
     if (success) {
-      // Lấy lại bản ghi đã cập nhật để gửi về client
       const updatedVaccination = await Vaccination.findById(vaccinationId);
       res.status(200).json({
         message: `Trạng thái lịch tiêm chủng với ID ${vaccinationId} đã được cập nhật thành công!`,

@@ -16,10 +16,8 @@ class Species {
 
   static async getById(speciesId) {
       const [rows] = await db.execute('SELECT species_id, species_name FROM species WHERE species_id = ?', [speciesId]);
-      return rows[0]; // Trả về đối tượng đầu tiên nếu tìm thấy
+      return rows[0];
   }
-
-  // Bạn có thể thêm các phương thức create, update, delete nếu cần
 
 }
 

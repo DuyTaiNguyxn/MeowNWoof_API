@@ -26,19 +26,14 @@ class Breed {
             FROM Breeds
             WHERE species_id = ?; -- ĐÂY LÀ PHẦN LỌC QUAN TRỌNG!
         `;
-        // Chú ý: speciesId từ req.params là một chuỗi, bạn có thể cần chuyển nó thành số nếu database yêu cầu
-        // Ví dụ: db.execute(query, [parseInt(speciesId)]);
         const [rows] = await db.execute(query, [speciesId]);
-        // Để đảm bảo Flutter có đủ thông tin, hãy bao gồm species_id trong đối tượng trả về của mỗi giống
         return rows.map(row => ({
             breed_id: row.breed_id,
             breed_name: row.breed_name,
-            species_id: row.species_id, // Quan trọng: Bao gồm species_id trong JSON phản hồi
+            species_id: row.species_id,
             description: row.description || null
         }));
     }
-
-  // Bạn có thể thêm các phương thức create, update, delete nếu cần
 
 }
 

@@ -112,7 +112,7 @@ class Pet {
 
     static async create(petData) {
         const { pet_name, species_id, breed_id, age, gender, weight, imageURL, owner } = petData;
-        let final_owner_id = null; // Khởi tạo owner_id cuối cùng
+        let final_owner_id = null;
 
         if (owner && owner.phone) {
             let existingOwner = await PetOwner.findByPhone(owner.phone);
@@ -134,13 +134,11 @@ class Pet {
             throw new Error('Thông tin chủ sở hữu (tên và số điện thoại) là bắt buộc.');
         }
 
-        // Thực hiện chèn thông tin pet vào cơ sở dữ liệu
         const [result] = await db.execute(
             'INSERT INTO Pets (pet_name, species_id, breed_id, age, gender, weight, imageURL, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [pet_name, species_id, breed_id, age, gender, weight, imageURL, final_owner_id]
         );
 
-        // Trả về thông tin pet đã tạo kèm theo owner_id
         return { pet_id: result.insertId, ...petData, owner_id: final_owner_id };
     }
 

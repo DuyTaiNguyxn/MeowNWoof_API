@@ -1,19 +1,16 @@
 // controllers/user.controller.js
 
-const User = require('../models/user.model'); // Import your User model
+const User = require('../models/user.model');
 
-// Helper function to exclude sensitive data (like password)
 const excludePassword = (user) => {
   if (!user) return null;
   const { password, ...rest } = user;
   return rest;
 };
 
-// 1. Lấy tất cả user: Bất kỳ user nào đã đăng nhập cũng có thể xem danh sách
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.findAll(); // Call model's findAll method
-    // Đảm bảo không trả về mật khẩu
+    const users = await User.findAll();
     res.json(users.map(user => excludePassword(user)));
   } catch (err) {
     console.error('Error fetching all users:', err);
@@ -21,23 +18,19 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// 2. Lấy thông tin user theo ID: User có thể xem của chính mình, Admin có thể xem bất kỳ ai
 exports.getUserById = async (req, res) => {
   const { id } = req.params;
-  const requestedId = parseInt(id, 10); // Đảm bảo ID là số nguyên
+  const requestedId = parseInt(id, 10);
 
   try {
-    // Kiểm tra quyền:
-    // Nếu người dùng không phải admin VÀ ID được yêu cầu không phải là ID của chính người dùng đó
     if (req.role !== 'admin' && req.employee_id !== requestedId) {
       return res.status(403).json({ message: 'Bạn không có quyền truy cập thông tin của user này.' });
     }
 
-    const user = await User.findById(requestedId); // Gọi model
+    const user = await User.findById(requestedId);
     if (!user) {
       return res.status(404).json({ message: 'Không tìm thấy user' });
     }
-    // Đảm bảo không trả về mật khẩu
     res.json(excludePassword(user));
   } catch (err) {
     console.error(`Error fetching user with ID ${id}:`, err);
@@ -45,19 +38,14 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// 3. Tạo user mới: Chỉ Admin mới được thêm
 exports.createUser = async (req, res) => {
-  // Vì route đã được bảo vệ bởi authMiddleware.isAdmin,
-  // chúng ta biết rằng người gọi hàm này đã là admin.
   const { full_name, email, phone, birth, address, role, avatarURL, username, password } = req.body;
 
-  // Validate required fields
   if (!full_name || !phone || !birth || !role || !username || !password) {
     return res.status(400).json({ message: 'Thiếu các trường bắt buộc: full_name, phone, birth, role, username, password.' });
   }
 
   try {
-    // Kiểm tra trùng lặp (username, email, phone)
     const existingUserByUsername = await User.findByUsername(username);
     if (existingUserByUsername) {
       return res.status(409).json({ message: 'Username đã tồn tại.' });
@@ -79,7 +67,7 @@ exports.createUser = async (req, res) => {
       full_name, email, phone, birth, address, role, avatarURL, username, password
     };
 
-    const employee_id = await User.create(newEmployeeData); // Gọi model
+    const employee_id = await User.create(newEmployeeData);
 
     res.status(201).json({ message: 'Tạo user thành công', employee_id });
   } catch (err) {
@@ -88,10 +76,9 @@ exports.createUser = async (req, res) => {
   }
 };
 
-// 4. Cập nhật user: User có thể cập nhật của chính mình, Admin có thể cập nhật bất kỳ ai
 exports.updateUser = async (req, res) => {
     const requestedId = parseInt(req.params.id);
-    const { email, phone, birth, ...updateFields } = req.body; // Lấy các trường muốn update
+    const { email, phone, birth, ...updateFields } = req.body;
 
     console.log(`[UserController] Cập nhật User ID: ${requestedId}`);
     console.log('[UserController] Dữ liệu nhận được từ body:', req.body);
@@ -102,7 +89,6 @@ exports.updateUser = async (req, res) => {
     console.log('[UserController] User Role từ token:', userRoleFromToken);
     console.log('[UserController] User ID từ token:', userIdFromToken);
 
-    // Kiểm tra quyền (chỉ admin hoặc chủ sở hữu mới được update)
     if (userRoleFromToken !== 'admin' && userIdFromToken !== requestedId) {
         return res.status(403).json({ message: 'Bạn không có quyền chỉnh sửa thông tin người dùng này.' });
     }
@@ -115,14 +101,12 @@ exports.updateUser = async (req, res) => {
         console.log('[UserController] Email existingUser từ DB:', existingUser.email);
         console.log('[UserController] Email từ request body:', email);
 
-        // Kiểm tra email trùng lặp (nếu email thay đổi và trùng với email khác)
         if (email && email !== existingUser.email) {
             const userWithNewEmail = await User.findByEmail(email);
             if (userWithNewEmail && userWithNewEmail.employee_id !== requestedId) {
                 return res.status(409).json({ message: 'Email đã tồn tại cho user khác.' });
             }
         }
-        // Kiểm tra phone trùng lặp (tương tự email)
         if (phone && phone !== existingUser.phone) {
             const userWithNewPhone = await User.findByPhone(phone);
             if (userWithNewPhone && userWithNewPhone.employee_id !== requestedId) {
@@ -130,7 +114,7 @@ exports.updateUser = async (req, res) => {
             }
         }
 
-        const fieldsToUpdate = { ...updateFields }; // Sao chép các trường đã được body-parser phân tích
+        const fieldsToUpdate = { ...updateFields };
 
         if (email) fieldsToUpdate.email = email;
         if (phone) fieldsToUpdate.phone = phone;
@@ -182,15 +166,12 @@ exports.updateUser = async (req, res) => {
     }
 };
 
-// 5. Xóa user: Chỉ Admin mới được xóa
 exports.deleteUser = async (req, res) => {
-  // Vì route đã được bảo vệ bởi authMiddleware.isAdmin,
-  // chúng ta biết rằng người gọi hàm này đã là admin.
   const { id } = req.params;
-  const requestedId = parseInt(id, 10); // Đảm bảo ID là số nguyên
+  const requestedId = parseInt(id, 10);
 
   try {
-    const result = await User.delete(requestedId); // Gọi model
+    const result = await User.delete(requestedId);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Không tìm thấy user để xóa' });
     }

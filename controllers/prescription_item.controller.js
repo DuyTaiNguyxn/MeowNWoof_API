@@ -1,6 +1,5 @@
 const PrescriptionItem = require('../models/prescription_item.model');
 
-// Tạo chi tiết đơn thuốc mới
 exports.create = async (req, res) => {
   try {
     const newItem = new PrescriptionItem(req.body);
@@ -11,7 +10,6 @@ exports.create = async (req, res) => {
   }
 };
 
-// Lấy tất cả chi tiết đơn thuốc
 exports.getAll = async (req, res) => {
   try {
     const items = await PrescriptionItem.getAll();
@@ -21,7 +19,6 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// Lấy chi tiết đơn thuốc theo ID
 exports.getById = async (req, res) => {
   try {
     const id = req.params.id;
@@ -35,7 +32,6 @@ exports.getById = async (req, res) => {
   }
 };
 
-// Lấy các chi tiết theo prescription_id
 exports.getByPrescriptionId = async (req, res) => {
   try {
     const prescriptionId = req.params.prescriptionId;
@@ -46,7 +42,6 @@ exports.getByPrescriptionId = async (req, res) => {
   }
 };
 
-// Cập nhật chi tiết đơn thuốc
 exports.update = async (req, res) => {
   try {
     const id = req.params.id;
@@ -60,7 +55,6 @@ exports.update = async (req, res) => {
   }
 };
 
-// Xóa chi tiết đơn thuốc
 exports.remove = async (req, res) => {
   try {
     const id = req.params.id;

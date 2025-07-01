@@ -29,7 +29,6 @@ class Vaccination {
       : null;
   }
 
-  // Phương thức tĩnh để thêm các join vào câu truy vấn SQL
   static _addJoins(query) {
     return `
       SELECT
@@ -45,7 +44,6 @@ class Vaccination {
     `;
   }
 
-  // Phương thức để tạo một bản ghi tiêm chủng mới
   static async create(data) {
     const [result] = await db.execute(
       `INSERT INTO vaccinationschedules (
@@ -70,49 +68,43 @@ class Vaccination {
     throw new Error('Không thể chèn lịch tiêm chủng vào CSDL.');
   }
 
-  // Phương thức để lấy tất cả các bản ghi tiêm chủng
   static async findAll() {
     const [rows] = await db.query(this._addJoins(''));
     return rows.map(row => new Vaccination(row));
   }
 
-  // Phương thức để tìm một bản ghi tiêm chủng theo ID
   static async findById(id) {
     const [rows] = await db.query(this._addJoins('WHERE vax.vaccination_id = ?'), [id]);
     return rows.length ? new Vaccination(rows[0]) : null;
   }
 
-  // Phương thức để cập nhật một bản ghi tiêm chủng
   static async update(id, data) {
     const fields = [];
     const values = [];
 
-    // Lọc các trường không thể cập nhật trực tiếp hoặc là đối tượng lồng ghép
     for (const key in data) {
       if (['vaccination_id', 'created_at', 'updated_at', 'pet', 'vaccine', 'employee'].includes(key)) continue;
       fields.push(`${key} = ?`);
       values.push(data[key]);
     }
 
-    if (fields.length === 0) return false; // Không có trường nào để cập nhật
+    if (fields.length === 0) return false;
 
-    values.push(id); // Thêm ID vào cuối mảng giá trị
+    values.push(id);
 
     const [result] = await db.query(
       `UPDATE vaccinationschedules SET ${fields.join(', ')} WHERE vaccination_id = ?`,
       values
     );
 
-    return result.affectedRows > 0; // Trả về true nếu có bản ghi bị ảnh hưởng
+    return result.affectedRows > 0;
   }
 
-  // Phương thức để xóa một bản ghi tiêm chủng
   static async delete(id) {
     const [result] = await db.query('DELETE FROM vaccinationschedules WHERE vaccination_id = ?', [id]);
-    return result.affectedRows > 0; // Trả về true nếu có bản ghi bị xóa
+    return result.affectedRows > 0;
   }
 
-  // Phương thức để thay đổi trạng thái tiêm chủng
   static async setStatus(id, newStatus) {
     const [result] = await db.query(
       `UPDATE vaccinationschedules SET status = ? WHERE vaccination_id = ?`,

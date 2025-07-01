@@ -17,7 +17,7 @@ class PetOwner {
           'INSERT INTO PetOwners (owner_name, phone, email, address) VALUES (?, ?, ?, ?)',
           [owner_name, phone, email, address]
       );
-      return { owner_id: result.insertId, ...ownerData }; // Trả về owner với ID mới
+      return { owner_id: result.insertId, ...ownerData };
   }
 
   static async findAll() {
@@ -34,8 +34,6 @@ class PetOwner {
       const [rows] = await db.execute('SELECT * FROM PetOwners WHERE phone = ?', [phone]);
       return rows.length > 0 ? new PetOwner(rows[0]) : null;
   }
-
-  // Thêm các phương thức update, delete tương tự như User model
 }
 
 module.exports = PetOwner;

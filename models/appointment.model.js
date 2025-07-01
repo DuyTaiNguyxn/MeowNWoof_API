@@ -11,7 +11,6 @@ class Appointment {
     this.created_at = data.created_at;
     this.updated_at = data.updated_at;
 
-    // Thông tin bác sĩ thú y
     this.veterinarian = data.veterinarian_employee_id
       ? {
           employee_id: data.veterinarian_employee_id,
@@ -20,7 +19,6 @@ class Appointment {
         }
       : null;
 
-    // Thông tin pet (thêm các trường từ bảng pets)
     this.pet = data.pet_name
       ? {
           pet_id: data.pet_id,

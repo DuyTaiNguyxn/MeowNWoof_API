@@ -1,5 +1,5 @@
 // models/user.model.js
-const db = require('../config/db'); // pool connection
+const db = require('../config/db');
 const bcrypt = require('bcrypt');
 
 class User {
@@ -18,7 +18,6 @@ class User {
     this.updated_at = data.updated_at;
   }
 
-  // Find all employees
   static async findAll() {
     const [rows] = await db.execute('SELECT * FROM Employees');
     return rows;
@@ -129,10 +128,9 @@ class User {
     }
   }
 
-  // Delete an employee by ID
   static async delete(id) {
     const [result] = await db.execute('DELETE FROM Employees WHERE employee_id = ?', [id]);
-    return result; // Contains affectedRows
+    return result;
   }
 
   static async comparePassword(plainPassword, hashedPassword) {

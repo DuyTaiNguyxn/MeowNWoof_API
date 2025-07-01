@@ -19,8 +19,6 @@ class MedicineType {
       return rows[0];
   }
 
-  // Bạn có thể thêm các phương thức create, update, delete nếu cần
-
 }
 
 module.exports = MedicineType;

@@ -39,7 +39,6 @@ exports.getPrescriptionByRecordId = async (req, res) => {
 
 exports.updatePrescription = async (req, res) => {
     try {
-        // Lấy dữ liệu cần update, chỉ lấy 2 trường thôi
         const { veterinarian_note, prescription_date } = req.body;
 
         if (veterinarian_note === undefined && prescription_date === undefined) {
@@ -70,7 +69,6 @@ exports.deleteItem = async (req, res) => {
     const prescriptionId = req.params.id;
 
     try {
-        // Xoá các prescription_item liên quan đến prescriptionId
         const deletedItemsCount = await Prescription.deleteItemsByPrescriptionId(prescriptionId);
 
         res.status(200).send({
