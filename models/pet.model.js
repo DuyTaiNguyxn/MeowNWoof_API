@@ -1,5 +1,6 @@
 // models/pet.model.js
 const db = require('../config/db');
+const PetOwner = require('./owner.model');
 
 class Pet {
     constructor(data) {
